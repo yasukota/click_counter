@@ -56,7 +56,7 @@ export default function Home() {
         alignItems: "center",
         justifyContent: "center",
         gap: "24px",
-        backgroundColor: "#f0fdf4",
+        backgroundColor: "#EAF3FF",
       }}
     >
       <h1>クリックカウンター</h1>
@@ -68,13 +68,13 @@ export default function Home() {
         onClick={() => void changeCount("POST")}
         style={{
           padding: "16px 32px",
-          backgroundColor: "#15803d",
+          backgroundColor: "#2457BA",
           color: "white",
           borderRadius: "30px",
           cursor: busy ? "wait" : "pointer",
         }}
       >
-        クリックしてね！
+        1回カウントする
       </button>
 
       <button
