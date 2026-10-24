@@ -1,4 +1,6 @@
 import { neon } from "@neondatabase/serverless";
+import { getAccess } from "@/lib/access";
+import { getAppOrigin } from "@/lib/auth-policy";
 
 async function updateCount(action: "read" | "add" | "reset") {
   const url = process.env.DATABASE_URL;
@@ -23,35 +25,47 @@ async function updateCount(action: "read" | "add" | "reset") {
              RETURNING count`;
 }
 
-async function handle(action: "read" | "add" | "reset") {
+async function handle(action: "read" | "add" | "reset", request: Request) {
+  const headers = { "Cache-Control": "no-store" };
   try {
+    const access = await getAccess();
+    if (access !== "allowed") {
+      const status = access === "unconfigured" ? 503 : access === "unauthenticated" ? 401 : 403;
+      return Response.json({ error: "この操作は許可されていません" }, { status, headers });
+    }
+
+    // Cookie authentication alone must not allow cross-site mutations.
+    if (action !== "read" && request.headers.get("origin") !== getAppOrigin()) {
+      return Response.json({ error: "この操作は許可されていません" }, { status: 403, headers });
+    }
+
     const rows = await updateCount(action);
 
     if (rows.length === 0) {
       return Response.json(
         { error: "Counter not found" },
-        { status: 404 }
+        { status: 404, headers }
       );
     }
 
-    return Response.json({ count: rows[0].count });
-  } catch (error) {
-    console.error(error);
+    return Response.json({ count: rows[0].count }, { headers });
+  } catch {
+    console.error("カウンターの処理に失敗しました。");
     return Response.json(
       { error: "Database error" },
-      { status: 500 }
+      { status: 500, headers }
     );
   }
 }
 
-export async function GET() {
-  return handle("read");
+export async function GET(request: Request) {
+  return handle("read", request);
 }
 
-export async function POST() {
-  return handle("add");
+export async function POST(request: Request) {
+  return handle("add", request);
 }
 
-export async function DELETE() {
-  return handle("reset");
+export async function DELETE(request: Request) {
+  return handle("reset", request);
 }
