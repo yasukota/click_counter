@@ -79,6 +79,7 @@ export default function Counter({ children }: { children: ReactNode }) {
       </button>
 
       <button
+        className="action-button action-button--danger"
         disabled={busy}
         onClick={() => void changeCount("DELETE")}
       >

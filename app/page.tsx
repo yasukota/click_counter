@@ -11,7 +11,7 @@ async function ProtectedCounter() {
   return (
     <Counter>
       <form action={logout}>
-        <button>ログアウト</button>
+        <button className="action-button">ログアウト</button>
       </form>
     </Counter>
   );

@@ -21,10 +21,10 @@ async function LoginContent({ searchParams }: Props) {
         <p role="alert">ログインできませんでした。許可されたアカウントか、設定を確認してください。</p>
       )}
       <form action={login}>
-        <button disabled={!configured}>Googleでログイン</button>
+        <button className="action-button action-button--primary" disabled={!configured}>Googleでログイン</button>
       </form>
       {access === "forbidden" && (
-        <form action={logout}><button>ログアウト</button></form>
+        <form action={logout}><button className="action-button">ログアウト</button></form>
       )}
     </>
   );
